@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    inject-sidecar: "true"
+  labels:
+    run: ng
+  name: ng
+  namespace: custom-mesh
+spec:
+  containers:
+  - image: nginx
+    imagePullPolicy: Always
+    name: ng
+

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xds-server
+  namespace: envoy-research
+spec:
+  selector:
+    matchLabels:
+      app: xds-server
+  template:
+    metadata:
+      labels:
+        app: xds-server
+    spec:
+      containers:
+      - name: xds-server
+        image: payaljain/xds-server
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xds-service
+  namespace: envoy-research
+spec:
+  type: ClusterIP
+  selector:
+    app: xds-server
+  ports:
+  - port: 80
+    targetPort: 80
+---
+
