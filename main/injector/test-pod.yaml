@@ -12,4 +12,17 @@ spec:
   - image: nginx
     imagePullPolicy: Always
     name: ng
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: envoy-admin
+spec:
+  selector:
+    run: ng
+  ports:
+  - port: 9901
+    targetPort: 9901
+  type: LoadBalancer
+
 

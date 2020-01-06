@@ -11,13 +11,47 @@ app.post('/', (req, res) => {
   let patch = ""
   if (req.body.request.object.metadata.annotations) {
     const annotation = req.body.request.object.metadata.annotations["inject-sidecar"]
+    const podName = req.body.request.object.metadata.name
+    const podNamespace = req.body.request.object.metadata.namespace
+
 
     if (annotation == "true") {
       patch = [
-        {"op": "add", "path": "/spec/containers/-", "value": {
-          "name": "envoy",
-          "image": "envoyproxy/envoy"
-        }}
+        {
+          "op": "add",
+          "path": "/spec/containers/-",
+          "value": {
+            "name": "envoy",
+            "image": "envoyproxy/envoy",
+            "args": [
+              "-c",
+              "/etc/envoy/envoy.yaml",
+              "--service-cluster",
+              "podNamespace",
+              "--service-node",
+              "podName",
+              "-l",
+              "trace"
+            ],
+            "volumeMounts": [
+              {
+                "name": "envoy-default-config",
+                "mountPath": "/etc/envoy"
+              }
+
+            ]
+          }
+        },
+        {
+          "op": "add",
+          "path": "/spec/volumes/-",
+          "value": {
+            "name": "envoy-default-config",
+            "configMap": {
+              "name": "envoy-config"
+            }
+          }
+        }
       ]
     }
   }
